@@ -13,7 +13,7 @@
     .card {
       background: #fff;
       padding: 20px;
-      max-width: 400px;
+      max-width: 450px;
       margin: auto;
       border-radius: 10px;
       box-shadow: 0 4px 10px rgba(0,0,0,0.1);
@@ -30,16 +30,46 @@
       border: none;
       border-radius: 5px;
     }
+    .hidden {
+      display: none;
+    }
   </style>
 </head>
 <body>
 
-  <div class="card">
+  <!-- LOGIN SCREEN -->
+  <div class="card" id="loginScreen">
     <h2>Doctor Login</h2>
     <input placeholder="Doctor ID">
     <input type="password" placeholder="Password">
-    <button>Login</button>
+    <button onclick="login()">Login</button>
   </div>
+
+  <!-- PATIENT SCREEN -->
+  <div class="card hidden" id="patientScreen">
+    <h2>New Patient</h2>
+    <label>Patient ID</label>
+    <input id="patientId" readonly>
+
+    <label>Symptoms</label>
+    <textarea placeholder="Enter symptoms"></textarea>
+
+    <label>Signs</label>
+    <textarea placeholder="Enter clinical signs"></textarea>
+
+    <button>Save Patient</button>
+  </div>
+
+<script>
+  function login() {
+    document.getElementById("loginScreen").classList.add("hidden");
+    document.getElementById("patientScreen").classList.remove("hidden");
+
+    // Auto-generate Patient ID
+    const pid = "PID-" + Math.floor(100000 + Math.random() * 900000);
+    document.getElementById("patientId").value = pid;
+  }
+</script>
 
 </body>
 </html>
