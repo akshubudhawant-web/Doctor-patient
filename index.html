@@ -69,7 +69,6 @@
   <h2>Nurse / Front Desk</h2>
   <div id="patientList"></div>
 </div>
-
 <script>
   function getPatients() {
     return JSON.parse(localStorage.getItem("patients") || "[]");
@@ -79,13 +78,14 @@
     localStorage.setItem("patients", JSON.stringify(patients));
   }
 
-  const isNurse = window.location.search.includes("role=nurse");
+  const params = new URLSearchParams(window.location.search);
+  const role = params.get("role");
 
-  if (isNurse) {
-    document.getElementById("loginScreen").style.display = "none";
-    document.getElementById("nurseScreen").style.display = "block";
-    renderPatients();
-  }
+  document.addEventListener("DOMContentLoaded", () => {
+    if (role === "nurse") {
+      showNurseView();
+    }
+  });
 
   document.getElementById("loginBtn").addEventListener("click", function () {
     document.getElementById("loginScreen").style.display = "none";
@@ -108,23 +108,24 @@
     patients.push(patient);
     savePatients(patients);
 
-    alert("Patient saved successfully");
+    alert("Patient saved");
 
     document.getElementById("symptoms").value = "";
     document.getElementById("signs").value = "";
-
-    renderPatients();
   }
 
-  function renderPatients() {
-    const list = document.getElementById("patientList");
-    if (!list) return;
+  function showNurseView() {
+    document.getElementById("loginScreen").style.display = "none";
+    document.getElementById("doctorScreen").style.display = "none";
+    document.getElementById("nurseScreen").style.display = "block";
 
+    const list = document.getElementById("patientList");
     const patients = getPatients();
+
     list.innerHTML = "";
 
     if (patients.length === 0) {
-      list.innerHTML = "<p>No patients yet</p>";
+      list.innerHTML = "<p>No patients saved yet</p>";
       return;
     }
 
@@ -132,12 +133,13 @@
       const div = document.createElement("div");
       div.className = "patient";
       div.innerHTML = `
-        <strong>${p.id}</strong><br/>
+        <strong>${p.id}</strong><br>
         <small>${p.time}</small>
       `;
       list.appendChild(div);
     });
   }
 </script>
+
 </body>
 </html>
