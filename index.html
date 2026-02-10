@@ -42,7 +42,7 @@
     <h2>Doctor Login</h2>
     <input placeholder="Doctor ID">
     <input type="password" placeholder="Password">
-    <button onclick="login()">Login</button>
+    <button id="loginBtn">Login</button>
   </div>
 
   <!-- PATIENT SCREEN -->
@@ -59,17 +59,28 @@
 
     <button>Save Patient</button>
   </div>
-
 <script>
-  function login() {
-    document.getElementById("loginScreen").classList.add("hidden");
-    document.getElementById("patientScreen").classList.remove("hidden");
+  document.getElementById("loginBtn").addEventListener("click", function () {
+    document.getElementById("loginScreen").style.display = "none";
+    document.getElementById("patientScreen").style.display = "block";
 
-    // Auto-generate Patient ID
     const pid = "PID-" + Math.floor(100000 + Math.random() * 900000);
     document.getElementById("patientId").value = pid;
+  });
+
+  function savePatient() {
+    const data = {
+      patientId: document.getElementById("patientId").value,
+      symptoms: document.getElementById("symptoms").value,
+      signs: document.getElementById("signs").value
+    };
+
+    localStorage.setItem("latestPatient", JSON.stringify(data));
+
+    document.getElementById("nurseScreen").style.display = "block";
+    document.getElementById("nurseData").textContent =
+      JSON.stringify(data, null, 2);
   }
 </script>
-
 </body>
 </html>
