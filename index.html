@@ -13,10 +13,11 @@
     .card {
       background: #fff;
       padding: 20px;
-      max-width: 450px;
+      max-width: 520px;
       margin: auto;
       border-radius: 10px;
       box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
     }
     input, textarea, button {
       width: 100%;
@@ -33,54 +34,92 @@
     .hidden {
       display: none;
     }
+    .patient {
+      border-bottom: 1px solid #ddd;
+      padding: 10px 0;
+    }
   </style>
 </head>
 <body>
 
-  <!-- LOGIN SCREEN -->
-  <div class="card" id="loginScreen">
-    <h2>Doctor Login</h2>
-    <input placeholder="Doctor ID">
-    <input type="password" placeholder="Password">
-    <button id="loginBtn">Login</button>
-  </div>
+<!-- LOGIN -->
+<div class="card" id="loginScreen">
+  <h2>Doctor Login</h2>
+  <button id="loginBtn">Login</button>
+</div>
 
-  <!-- PATIENT SCREEN -->
-  <div class="card hidden" id="patientScreen">
-    <h2>New Patient</h2>
-    <label>Patient ID</label>
-    <input id="patientId" readonly>
+<!-- DOCTOR VIEW -->
+<div class="card hidden" id="doctorScreen">
+  <h2>New Patient</h2>
 
-    <label>Symptoms</label>
-    <textarea placeholder="Enter symptoms"></textarea>
+  <label>Patient ID</label>
+  <input id="patientId" readonly>
 
-    <label>Signs</label>
-    <textarea placeholder="Enter clinical signs"></textarea>
+  <label>Symptoms</label>
+  <textarea id="symptoms"></textarea>
 
-    <button>Save Patient</button>
-  </div>
+  <label>Signs</label>
+  <textarea id="signs"></textarea>
+
+  <button onclick="savePatient()">Save Patient</button>
+</div>
+
+<!-- NURSE VIEW -->
+<div class="card hidden" id="nurseScreen">
+  <h2>Nurse / Front Desk</h2>
+  <div id="patientList"></div>
+</div>
+
 <script>
+  const isNurse = window.location.search.includes("role=nurse");
+
+  const patients = JSON.parse(localStorage.getItem("patients") || "[]");
+
+  if (isNurse) {
+    document.getElementById("loginScreen").style.display = "none";
+    document.getElementById("nurseScreen").style.display = "block";
+    renderPatients();
+  }
+
   document.getElementById("loginBtn").addEventListener("click", function () {
     document.getElementById("loginScreen").style.display = "none";
-    document.getElementById("patientScreen").style.display = "block";
+    document.getElementById("doctorScreen").style.display = "block";
 
     const pid = "PID-" + Math.floor(100000 + Math.random() * 900000);
     document.getElementById("patientId").value = pid;
   });
 
   function savePatient() {
-    const data = {
-      patientId: document.getElementById("patientId").value,
+    const patient = {
+      id: document.getElementById("patientId").value,
       symptoms: document.getElementById("symptoms").value,
-      signs: document.getElementById("signs").value
+      signs: document.getElementById("signs").value,
+      time: new Date().toLocaleString()
     };
 
-    localStorage.setItem("latestPatient", JSON.stringify(data));
+    patients.push(patient);
+    localStorage.setItem("patients", JSON.stringify(patients));
 
-    document.getElementById("nurseScreen").style.display = "block";
-    document.getElementById("nurseData").textContent =
-      JSON.stringify(data, null, 2);
+    alert("Patient saved");
+    document.getElementById("symptoms").value = "";
+    document.getElementById("signs").value = "";
+  }
+
+  function renderPatients() {
+    const list = document.getElementById("patientList");
+    list.innerHTML = "";
+
+    patients.forEach(p => {
+      const div = document.createElement("div");
+      div.className = "patient";
+      div.innerHTML = `
+        <strong>${p.id}</strong><br/>
+        <small>${p.time}</small>
+      `;
+      list.appendChild(div);
+    });
   }
 </script>
+
 </body>
 </html>
