@@ -71,9 +71,15 @@
 </div>
 
 <script>
-  const isNurse = window.location.search.includes("role=nurse");
+  function getPatients() {
+    return JSON.parse(localStorage.getItem("patients") || "[]");
+  }
 
-  const patients = JSON.parse(localStorage.getItem("patients") || "[]");
+  function savePatients(patients) {
+    localStorage.setItem("patients", JSON.stringify(patients));
+  }
+
+  const isNurse = window.location.search.includes("role=nurse");
 
   if (isNurse) {
     document.getElementById("loginScreen").style.display = "none";
@@ -90,6 +96,8 @@
   });
 
   function savePatient() {
+    const patients = getPatients();
+
     const patient = {
       id: document.getElementById("patientId").value,
       symptoms: document.getElementById("symptoms").value,
@@ -98,16 +106,27 @@
     };
 
     patients.push(patient);
-    localStorage.setItem("patients", JSON.stringify(patients));
+    savePatients(patients);
 
-    alert("Patient saved");
+    alert("Patient saved successfully");
+
     document.getElementById("symptoms").value = "";
     document.getElementById("signs").value = "";
+
+    renderPatients();
   }
 
   function renderPatients() {
     const list = document.getElementById("patientList");
+    if (!list) return;
+
+    const patients = getPatients();
     list.innerHTML = "";
+
+    if (patients.length === 0) {
+      list.innerHTML = "<p>No patients yet</p>";
+      return;
+    }
 
     patients.forEach(p => {
       const div = document.createElement("div");
@@ -120,6 +139,5 @@
     });
   }
 </script>
-
 </body>
 </html>
