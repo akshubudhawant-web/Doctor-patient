@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Doctor Patient App</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #eef2f5;
+      padding: 20px;
+    }
+    .card {
+      background: #fff;
+      padding: 20px;
+      max-width: 520px;
+      margin: auto;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+    input, textarea, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      font-size: 16px;
+    }
+    button {
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+    }
+    .hidden {
+      display: none;
+    }
+    .patient {
+      border-bottom: 1px solid #ddd;
+      padding: 10px 0;
+    }
+  </style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="card" id="loginScreen">
+  <h2>Doctor Login</h2>
+  <button id="loginBtn">Login</button>
+</div>
+
+<!-- DOCTOR VIEW -->
+<div class="card hidden" id="doctorScreen">
+  <h2>New Patient</h2>
+
+  <label>Patient ID</label>
+  <input id="patientId" readonly>
+
+  <label>Symptoms</label>
+  <textarea id="symptoms"></textarea>
+
+  <label>Signs</label>
+  <textarea id="signs"></textarea>
+
+  <button onclick="savePatient()">Save Patient</button>
+</div>
+
+<!-- NURSE VIEW -->
+<div class="card hidden" id="nurseScreen">
+  <h2>Nurse / Front Desk</h2>
+  <div id="patientList"></div>
+</div>
+<script>
+  function getPatients() {
+    return JSON.parse(localStorage.getItem("patients") || "[]");
+  }
+
+  function savePatients(patients) {
+    localStorage.setItem("patients", JSON.stringify(patients));
+  }
+
+  const params = new URLSearchParams(window.location.search);
+  const role = params.get("role");
+
+  document.addEventListener("DOMContentLoaded", () => {
+    if (role === "nurse") {
+      showNurseView();
+    }
+  });
+
+  document.getElementById("loginBtn").addEventListener("click", function () {
+    document.getElementById("loginScreen").style.display = "none";
+    document.getElementById("doctorScreen").style.display = "block";
+
+    const pid = "PID-" + Math.floor(100000 + Math.random() * 900000);
+    document.getElementById("patientId").value = pid;
+  });
+
+  function savePatient() {
+    const patients = getPatients();
+
+    const patient = {
+      id: document.getElementById("patientId").value,
+      symptoms: document.getElementById("symptoms").value,
+      signs: document.getElementById("signs").value,
+      time: new Date().toLocaleString()
+    };
+
+    patients.push(patient);
+    savePatients(patients);
+
+    alert("Patient saved");
+
+    document.getElementById("symptoms").value = "";
+    document.getElementById("signs").value = "";
+  }
+
+  function showNurseView() {
+    document.getElementById("loginScreen").style.display = "none";
+    document.getElementById("doctorScreen").style.display = "none";
+    document.getElementById("nurseScreen").style.display = "block";
+
+    const list = document.getElementById("patientList");
+    const patients = getPatients();
+
+    list.innerHTML = "";
+
+    if (patients.length === 0) {
+      list.innerHTML = "<p>No patients saved yet</p>";
+      return;
+    }
+
+    patients.forEach(p => {
+      const div = document.createElement("div");
+      div.className = "patient";
+      div.innerHTML = `
+        <strong>${p.id}</strong><br>
+        <small>${p.time}</small>
+      `;
+      list.appendChild(div);
+    });
+  }
+</script>
+
+</body>
+</html>
