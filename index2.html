@@ -19,7 +19,7 @@
       box-shadow: 0 4px 10px rgba(0,0,0,0.1);
       margin-bottom: 20px;
     }
-    input, textarea, button {
+    input, textarea, select, button {
       width: 100%;
       padding: 10px;
       margin-top: 10px;
@@ -55,11 +55,28 @@
   <label>Patient ID</label>
   <input id="patientId" readonly>
 
+  <label>Age</label>
+  <input type="number" id="age" placeholder="Age in years">
+
+  <label>Sex</label>
+  <select id="sex">
+    <option value="">Select</option>
+    <option value="Male">Male</option>
+    <option value="Female">Female</option>
+    <option value="Other">Other</option>
+  </select>
+
+  <label>Chief Complaint</label>
+  <input id="chiefComplaint" placeholder="e.g. Fever and cough">
+
   <label>Symptoms</label>
   <textarea id="symptoms"></textarea>
 
   <label>Signs</label>
   <textarea id="signs"></textarea>
+
+  <label>Past History / Comorbidities</label>
+  <textarea id="history" placeholder="e.g. Diabetes, HTN, None"></textarea>
 
   <button onclick="savePatient()">Save Patient</button>
 </div>
@@ -69,6 +86,7 @@
   <h2>Nurse / Front Desk</h2>
   <div id="patientList"></div>
 </div>
+
 <script>
   function getPatients() {
     return JSON.parse(localStorage.getItem("patients") || "[]");
@@ -100,8 +118,12 @@
 
     const patient = {
       id: document.getElementById("patientId").value,
+      age: document.getElementById("age").value,
+      sex: document.getElementById("sex").value,
+      chiefComplaint: document.getElementById("chiefComplaint").value,
       symptoms: document.getElementById("symptoms").value,
       signs: document.getElementById("signs").value,
+      history: document.getElementById("history").value,
       time: new Date().toLocaleString()
     };
 
@@ -110,8 +132,13 @@
 
     alert("Patient saved");
 
+    // Clear fields
+    document.getElementById("age").value = "";
+    document.getElementById("sex").value = "";
+    document.getElementById("chiefComplaint").value = "";
     document.getElementById("symptoms").value = "";
     document.getElementById("signs").value = "";
+    document.getElementById("history").value = "";
   }
 
   function showNurseView() {
